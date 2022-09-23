@@ -1,0 +1,70 @@
+---
+title: "thunder_haoyangyan"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r cars}
+library(tidyverse)
+setwd("C:/Users/yanhy/Desktop/3rd/interview")
+data <- read_csv("shots_data.csv")
+
+type <- c()
+for (i in c(1:nrow(data))){
+  if (abs(data[i,'x'])>22 & data[i,'y']<=7.8){
+    type[i] <- 'C3' 
+  } else if(((data[i,'x']^2+data[i,'y']^2)>23.75^2) | (abs(data[i,'x'])>22 & data[i,'y']>7.8)){
+    type[i] <- 'NC3' 
+  } else{
+    type[i] <- '2PT' 
+  }
+}
+data <- cbind(data,type)
+
+Adata <- data %>%
+  filter(
+    team %in% 'Team A'
+  )
+Bdata <- data %>%
+  filter(
+    team %in% 'Team B'
+  )
+
+Aprop <- prop.table(table(Adata$type))
+Bprop <- prop.table(table(Bdata$type))
+
+##
+AFGM <- nrow(Adata %>% filter(fgmade %in% 1))
+AthreePM <- nrow(Adata %>% filter(fgmade %in% 1, type %in% c('C3','NC3')))
+AFGA <- nrow(Adata)
+AeFG <- (AFGM+0.5*AthreePM)/AFGA
+
+BFGM <- nrow(Bdata %>% filter(fgmade %in% 1))
+BthreePM <- nrow(Bdata %>% filter(fgmade %in% 1, type %in% c('C3','NC3')))
+BFGA <- nrow(Bdata)
+BeFG <- (BFGM+0.5*BthreePM)/BFGA
+
+##
+AeFG2pt <- nrow(Adata %>% filter(fgmade %in% 1, type %in% '2PT'))/nrow(Adata %>% filter(type %in% '2PT'))
+AeFGC3 <- 1.5*nrow(Adata %>% filter(fgmade %in% 1, type %in% 'C3'))/nrow(Adata %>% filter(type %in% 'C3'))
+AeFGNC3 <- 1.5*nrow(Adata %>% filter(fgmade %in% 1, type %in% 'NC3'))/nrow(Adata %>% filter(type %in% 'NC3'))
+BeFG2pt <- nrow(Bdata %>% filter(fgmade %in% 1, type %in% '2PT'))/nrow(Bdata %>% filter(type %in% '2PT'))
+BeFGC3 <- 1.5*nrow(Bdata %>% filter(fgmade %in% 1, type %in% 'C3'))/nrow(Bdata %>% filter(type %in% 'C3'))
+BeFGNC3 <- 1.5*nrow(Bdata %>% filter(fgmade %in% 1, type %in% 'NC3'))/nrow(Bdata %>% filter(type %in% 'NC3'))
+
+##
+Aprop
+Bprop
+AeFG2pt
+AeFGC3
+AeFGNC3
+BeFG2pt
+BeFGC3
+BeFGNC3
+```
+
